@@ -3,6 +3,7 @@ using namespace std;
 
 #define endl '\n';
 using namespace std;
+
 class node {
 public:
   int data;
@@ -93,6 +94,8 @@ int diameter(node *root) {
   int op3 = diameter(root->right);
   return max({op1, op2, op3});
 }
+
+
 pair<int, int> fastdiameter(node *root) {
   pair<int, int> p;
   if (root == NULL) {
@@ -182,7 +185,7 @@ int countnodes(node *root) {
 int sumofnodes(node * root) {
   if (root == NULL)
     return 0;
-  return root->data + sumofnodes(root->left) + sumofnodes(root->right);
+  return   sumofnodes(root->left) + sumofnodes(root->right) + root->data;
 }
 int sumofchildnodes(node *root) {
   if (root == NULL)  //to handle when we go to the right of a particular node
@@ -450,79 +453,197 @@ void printlist(node* head) {
   }
 }
 
+vector<int> v;
+void printklevel(node *root, int k) {
+  if (root == NULL)
+    return;
+  if (k == 0) {
+    v.push_back(root->data);
+    return;
+  }
+  printklevel(root->left, k - 1);
+  printklevel(root->right, k - 1);
+}
+node* t = NULL;
+void findtarget(node* root, int tar) {
+  if (root == NULL)
+    return;
+  if (root->data == tar) {
+    t = root;
+    return;
+  }
+  findtarget(root->left, tar);
+  findtarget(root->right, tar);
+}
+
+int uppernodes(node*root, node* tar, int k) {
+  if (root == NULL)
+    return -1;
+  if (root == tar) {
+    return 0;
+  }
+  int l = uppernodes(root->left, tar, k);
+  if (l != -1) {
+    if (l + 1 == k)
+      v.push_back(root->data);
+    else
+      printklevel(root->right, k - l - 2);
+    return l + 1;
+  }
+  int r = uppernodes(root->right, tar, k);
+  if (r != -1) {
+    if (r + 1 == k)
+      v.push_back(root->data);
+    else
+      printklevel(root->left, k - r - 2);
+    cout << "hi";
+    return r + 1;
+  }
+  return -1;
+
+}
+vector <int> KDistanceNodes(node* root, int target , int k)
+{
+  // return the sorted vector of all nodes at k dist
+  v.clear();
+
+  findtarget(root, target);
+  printklevel(t, k);
+  int q = uppernodes(root, t, k);
+  return v;
+
+}
+void convertToMirror(node* root)
+{
+  // base case: if the tree is empty
+  if (root == nullptr) {
+    return;
+  }
+
+  // convert left subtree
+  convertToMirror(root->left);
+
+  // convert right subtree
+  convertToMirror(root->right);
+
+  // swap left subtree with right subtree
+  swap(root->left, root->right);
+}
+vector<int> topView(node *root)
+{
+  //Your code here
+  vector<int> l, r;
+  queue<node*> mq;
+  mq.push(root);
+  int mid = root->data;
+  while (!mq.empty()) {
+    int s = mq.size();
+    for (int i = 0; i < s; i++) {
+      node* temp = mq.front();
+      mq.pop();
+      if (s != 1 and i == 0) {
+        l.push_back(temp->data);
+      }
+      if ( i == s - 1) {
+        r.push_back(temp->data);
+      }
+      if (temp->left) {
+        mq.push(temp->left);
+      }
+      if (temp->right) {
+        mq.push(temp->right);
+      }
+    }
+  }
+  reverse(l.begin(), l.end());
+  for (int i = 0; i < r.size(); i++) {
+    l.push_back(r[i]);
+  }
+  return l;
+
+}
 int main() {
 
 
   node* root = buildTree();
-  map<int, vector<int>> m;
-  int d = 0;
-  verticalorderprint(root, d, m);
-  for (auto p : m) {
-    for (auto i : p.second)
-      cout << i << ' ';
-    cout << endl;
-  }
-  cout << "Inorderprint\n";
-  inorderprint(root);
-  cout << "\nPostorderprint\n";
-  postOrderPrint(root);
-  cout << "\nPreorderprint\n";
-  preorderprint(root);
-  cout << "\nThe height of the tree is\n";
-  cout << heightoftree(root);
-  cout << "\n3rd level of the tree\n";
-  printkthlevel(root, 3);
-  cout << "\nLevelorderprint\n";
-  levelorderprint(root);
-  cout << "\nBFS (Breadth first travesal) i.e levelorderprint in O(N)\n";
-  bfs(root);
-  cout << "\nbfs1\n";
-  bfs1_by_me(root);
-  cout << "\nbfs2\n";
+  // map<int, vector<int>> m;
+  // int d = 0;
+  // verticalorderprint(root, d, m);
+  // for (auto p : m) {
+  //   for (auto i : p.second)
+  //     cout << i << ' ';
+  //   cout << endl;
+  // }
+  // cout << "Inorderprint\n";
+  // inorderprint(root);
+  // cout << "\nPostorderprint\n";
+  // postOrderPrint(root);
+  // cout << "\nPreorderprint\n";
+  // preorderprint(root);
+  // cout << "\nThe height of the tree is\n";
+  // cout << heightoftree(root);
+  // cout << "\n3rd level of the tree\n";
+  // printkthlevel(root, 3);
+  // cout << "\nLevelorderprint\n";
+  // levelorderprint(root);
+  // cout << "\nBFS (Breadth first travesal) i.e levelorderprint in O(N)\n";
+  //bfs(root);
+  // cout << "\nbfs1\n";
+  // bfs1_by_me(root);
+  // cout << "\nbfs2\n";
   bfs2(root);
-  cout << "Count of nodes are\n";
-  cout << countnodes(root);
-  cout << "\nSum of all the nodes are\n";
-  cout << sumofnodes(root);
-  cout << "\nDiameter of the tree\n";
-  cout << diameter(root);
-  cout << "\nFast Diameter of the tree\n";
-  pair<int, int> p = fastdiameter(root);
-  cout << max(p.first, p.second) ;    //p.first=heightoftree and p.second=diameter of tree
-  //sumofchildnodes(root);
-  cout << "\nThe sum of child nodes in the tree\n";
-  bfs2(root);
-  if (isheightbalance(root).second) {
-    cout << "Tree is Height balanced\n";
-  }
-  else {
-    cout << "Tree is not Height balanced\n";
-  }
-  int a[] = {1, 2, 3, 4, 5, 6, 7};
-  node *t = buildfromArray(a, 0, 6);
-  bfs2(t);
-  int pre[] = {1, 2, 3, 4, 8, 5, 6, 7};
-  int in[] = {3, 2, 8, 4, 1, 6, 7, 5};
-  node*q = createTreefromTrav(in, pre, 0, 7);
-  bfs2(q);
-  cout << "\nRight View" << endl;
-  //rightview(root, 1);
-  cout << "Nodes at a distance k from a given node\n";
-  //printAtKDistance(root, 3, 2);
-  cout << "LCA \n";
-  cout << lca1(root, 0, 4) << endl;
-  cout << "LCA 2 (Optimized)\n";
-  node* ok = lca2(root, 0, 4);
-  if (ok != NULL)
-    cout << ok->data;
-  cout << "\nMaximum path from node to node is\n";
-  maxPathNode2Node(root);
-  cout << globalmax << endl;
-  cout << "distance between any 2 nodes is\n";
-  cout << distance2nodes(root, 8, 0) << endl;
-  cout << "Converting Tree to Doubly linkedlist\n";
-  B2LL(root);
-  printlist(head);
+  // convertToMirror(root);
+  // cout << "Count of nodes are\n";
+  // cout << countnodes(root);
+  // cout << "\nSum of all the nodes are\n";
+  // cout << sumofnodes(root);
+  // cout << "\nDiameter of the tree\n";
+  // cout << diameter(root);
+  // cout << "\nFast Diameter of the tree\n";
+  // pair<int, int> p = fastdiameter(root);
+  // cout << max(p.first, p.second) ;    //p.first=heightoftree and p.second=diameter of tree
+  // //sumofchildnodes(root);
+  // cout << "\nThe sum of child nodes in the tree\n";
+  // bfs2(root);
+  // if (isheightbalance(root).second) {
+  //   cout << "Tree is Height balanced\n";
+  // }
+  // else {
+  //   cout << "Tree is not Height balanced\n";
+  // }
+  // int a[] = {1, 2, 3, 4, 5, 6, 7};
+  // node *t = buildfromArray(a, 0, 6);
+  // bfs2(t);
+  // int pre[] = {1, 2, 3, 4, 8, 5, 6, 7};
+  // int in[] = {3, 2, 8, 4, 1, 6, 7, 5};
+  // node*q = createTreefromTrav(in, pre, 0, 7);
+  // bfs2(q);
+  // cout << "\nRight View" << endl;
+  // //rightview(root, 1);
+  // cout << "Nodes at a distance k from a given node\n";
+  // //printAtKDistance(root, 3, 2);
+  // cout << "LCA \n";
+  // cout << lca1(root, 0, 4) << endl;
+  // cout << "LCA 2 (Optimized)\n";
+  // node* ok = lca2(root, 0, 4);
+  // if (ok != NULL)
+  //   cout << ok->data;
+  // cout << "\nMaximum path from node to node is\n";
+  // maxPathNode2Node(root);
+  // cout << globalmax << endl;
+  // cout << "distance between any 2 nodes is\n";
+  // cout << distance2nodes(root, 8, 0) << endl;
+  // cout << "Converting Tree to Doubly linkedlist\n";
+  // B2LL(root);
+  // printlist(head);
+  // printkthlevel(root, 3);
+  // bfs2(root);
+  vector<int>vv = topView(root);
+  cout << endl;
+  for (auto it : vv)
+    cout << it << ' ';
+  cout << endl;
+  // postOrderPrint(root);
 
 }
 

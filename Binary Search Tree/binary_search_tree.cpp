@@ -1,8 +1,5 @@
+// Write a Program to implement Binary Search Tree
 #include<bits/stdc++.h>
-using namespace std;
-#define sync ios::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
-#define endl '\n';
-#define ll long long
 using namespace std;
 class node {
 public:
@@ -14,11 +11,11 @@ public:
 		left = right = NULL;
 	}
 };
+
 node* insertInBST(node*root, int data) {
 	if (root ==  NULL) {
 		return new node(data);
 	}
-
 	if (data > root->data) {
 		root->right = insertInBST(root->right, data);
 	}
@@ -164,11 +161,6 @@ void llprint(node *head) {
 	}
 }
 int main() {
-#ifndef ONLINE_JUDGE
-	freopen("input.txt", "r", stdin);
-	freopen("output.txt", "w", stdout);
-#endif
-	sync;
 	node* root = buildBST();
 	bfs(root);
 	cout << "Inorder Print\n";
